@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+    <!--
+        url-pattern详解:
+
+        当一个请求发送到servlet容器的时候，容器先会将请求的url减去当前应用上下文的路径作为servlet的映射url，
+        比如我访问的是 http://localhost/test/aaa.html，我的应用上下文是test，容器会将http://localhost/test去掉，
+        剩下的/aaa.html部分拿来做servlet的映射匹配。这个映射匹配过程是有顺序的，而且当有一个servlet匹配成功以后，
+        就不会去理会剩下的servlet了（filter不同，后文会提到）。其匹配规则和顺序如下：
+
+        1.精确路径匹配。       例子：比如servletA 的url-pattern为 /test，servletB的url-pattern为 /* ，
+            这个时候，如果我访问的url为http://localhost/test ，这个时候容器就会先进行精确路径匹配，
+            发现/test正好被servletA精确匹配，那么就去调用servletA，也不会去理会其他的 servlet了。
+        2.最长路径匹配。       例子：servletA的url-pattern为/test/*，而servletB的url-pattern为/test/a/*，
+            此时访问http://localhost/test/a时，容器会选择路径最长的servlet来匹配，也就是这里的servletB。
+        3.扩展匹配，如果url最后一段包含扩展，容器将会根据扩展选择合适的servlet。
+            例子：servletA的url-pattern：*.action
+        4.如果前面三条规则都没有找到一个servlet，容器会根据url选择对应的请求资源。
+            如果应用定义了一个default servlet，则容器会将请求丢给default servlet。
+
+        1.路径映射:  以”/’开头和以”/*”结尾的。
+        2.扩展映射:  以前缀”*.”开头的。
+        3.default servlet映射:     “/” (比如下面的portalServlet)
+        4.详细映射: 剩下的都是。比如： /aa/bb/cc.action
+     -->
+
+    <!--
+        上下文     即ServletContext,是一个全局的储存信息的空间，服务器启动，其就存在，服务器关闭，其才释放。
+        所有用户共用一个ServletContext。
+        获取ServletContext:
+        HttpSession session = request.getSession();
+        session.getServletContext();
+     -->
+
+    <!-- 配置 Web 应用初始化参数指定视图前缀、后缀 -->
+    <!--
+        物理视图举例: /WEB-INF/pages/index.html
+        对应逻辑视图: index
+     -->
+    <context-param>
+        <param-name>view-prefix</param-name>
+        <param-value>/WEB-INF/pages/</param-value>
+    </context-param>
+    <context-param>
+        <param-name>view-suffix</param-name>
+        <param-value>.html</param-value>
+    </context-param>
+
+    <!-- 注册 PortalServlet 类 -->
+    <servlet>
+        <servlet-name>portalServlet</servlet-name>
+        <servlet-class>com.yang.all_in_one.servlet.module.PortalServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>portalServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!-- 注册 AuthServlet 类 -->
+    <servlet>
+        <servlet-name>authServlet</servlet-name>
+        <servlet-class>com.yang.all_in_one.servlet.module.AuthServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>authServlet</servlet-name>
+        <url-pattern>/auth</url-pattern>
+    </servlet-mapping>
+
+    <!-- 注册 WorkServlet 类 -->
+    <servlet>
+        <servlet-name>workServlet</servlet-name>
+        <servlet-class>com.yang.all_in_one.servlet.module.WorkServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>workServlet</servlet-name>
+        <url-pattern>/work</url-pattern>
+    </servlet-mapping>
+
+    <!-- Filter的处理顺序和filter在web.xml中定义的顺序相同 -->
+    <!-- 放在TransactionFilter之前执行 -->
+    <filter>
+        <!-- 给过滤器分配一个名字 -->
+        <filter-name>loginFilter</filter-name>
+        <!-- filter类的位置   过滤器实现类的完整限定类名 -->
+        <filter-class>com.yang.all_in_one.filter.LoginFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <!-- 与上面分配的名字匹配 -->
+        <filter-name>loginFilter</filter-name>
+        <!-- 声明一个以"/"开始的模式,它指定过滤器应用的URL,这里/*就是代表所有,所以在TransactionFilter里面有个静态过滤 -->
+        <url-pattern>/work</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>allInOneFilter</filter-name>
+        <filter-class>com.yang.all_in_one.filter.TransactionFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>allInOneFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+</web-app>

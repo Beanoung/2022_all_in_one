@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<!-- thymeleaf笔记
+语法:
+${...}  变量表达式       取出上下文变量的值
+*{...}  选择变量表达式    取出选择的对象的属性值
+#{...}  消息表达式       使文字消息国际化(?)
+@{...}  链接表达式       用于表达各种超链接地址
+~{...}  片段表达式       引用一段公共的代码片段
+ -->
+
+<!-- 定义th名称空间,以及th的来源="..." -->
+<html lang="en" xml:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <style type="text/css">
+        div{
+            width: 100%;
+            height: 600px;
+            position: absolute;
+            top:50%;
+            margin-top: -100px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<!-- th:action 用于定义后台控制器的路径,类似<form>标签的action属性 -->
+<form th:action="@{/auth}" method="post">
+    <!-- 隐藏域  传递 method 请求参数，目的是为了让当前表单请求调用 AuthServlet 中的 login() 方法 -->
+    <input type="hidden" name="method" value="login" />
+
+    <div>
+        <p style="color: crimson;font-size: 20px">乾清宫要地，请进行身份验证!</p><br/>
+        <!-- th:text 解析表达式后会替换标签体 -->
+        <!-- ${attrName} 从请求域获取属性名为 attrName 的属性值 -->
+        <p th:text="${message}"></p>
+        <p th:text="${systemMessage}"></p>
+        账号：<input style="margin-top: 30px;" type="text" name="loginAccount"/><br/>
+        密码：<input type="password" name="loginPassword"><br/>
+       <button style="margin-top: 10px;margin-left: 200px"  type="submit">进宫</button>
+    </div>
+</form>
+</body>
+</html>

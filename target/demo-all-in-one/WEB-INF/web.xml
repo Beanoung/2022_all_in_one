@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+
+    <!-- 配置 Web 应用初始化参数指定视图前缀、后缀 -->
+    <!--
+        物理视图举例: /WEB-INF/pages/index.html
+        对应逻辑视图: index
+     -->
+    <context-param>
+        <param-name>view-prefix</param-name>
+        <param-value>/WEB-INF/pages/</param-value>
+    </context-param>
+    <context-param>
+        <param-name>view-suffix</param-name>
+        <param-value>.html</param-value>
+    </context-param>
+
+    <!-- 注册 PortalServlet 类 -->
+    <servlet>
+        <servlet-name>portalServlet</servlet-name>
+        <servlet-class>com.yang.all_in_one.servlet.module.PortalServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>portalServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!-- 注册 AuthServlet 类 -->
+    <servlet>
+        <servlet-name>authServlet</servlet-name>
+        <servlet-class>com.yang.all_in_one.servlet.module.AuthServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>authServlet</servlet-name>
+        <url-pattern>/auth</url-pattern>
+    </servlet-mapping>
+
+    <!-- 注册 WorkServlet 类 -->
+    <servlet>
+        <servlet-name>workServlet</servlet-name>
+        <servlet-class>com.yang.all_in_one.servlet.module.WorkServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>workServlet</servlet-name>
+        <url-pattern>/work</url-pattern>
+    </servlet-mapping>
+
+    <!-- 放在TransactionFilter之前执行 -->
+    <filter>
+        <filter-name>loginFilter</filter-name>
+        <filter-class>com.yang.all_in_one.filter.LoginFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>loginFilter</filter-name>
+        <url-pattern>/work</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <!-- 给过滤器分配一个名字 -->
+        <filter-name>allInOneFilter</filter-name>
+        <!-- filter类的位置   过滤器实现类的完整限定类名 -->
+        <filter-class>com.yang.all_in_one.filter.TransactionFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <!-- 与上面分配的名字匹配 -->
+        <filter-name>allInOneFilter</filter-name>
+        <!-- 声明一个以"/"开始的模式,它指定过滤器应用的URL,这里/*就是代表所有,所以在TransactionFilter里面有个静态过滤 -->
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+</web-app>
